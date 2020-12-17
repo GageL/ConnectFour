@@ -1,0 +1,3 @@
+* Demonstrate using both direct UI Button onClick listener via code as well as baked UnityEvent (different use cases)
+* Considerations, adding or removing elements in the palette can cause issues with indexing and will want to make this more baked for ease of use
+

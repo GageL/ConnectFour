@@ -1,0 +1,25 @@
+https://www.fgbradleys.com/rules/Connect%20Four.pdf
+
+Basic Requirements:
+
+● Gameplay should take place in Unity UI.
+
+● Player Input should be mouse-based.
+
+● Play should alternate between an AI Player and a Human player to place a checker into one of the columns.
+
+● AI Player makes random decisions.
+
+● When a checker is dropped into a column, it immediately falls to the lowest available spot.
+
+● Checkers cannot be placed in columns that are full.
+
+● Option to reset the game.
+
+Extra Credit
+
+● Add some basic animations.
+
+● Detect when a game is won.
+
+● Build a simple algorithm that makes optimal decisions to win and employs some strategy.
