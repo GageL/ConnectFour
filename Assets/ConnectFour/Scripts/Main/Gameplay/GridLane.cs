@@ -21,12 +21,16 @@ namespace C4 {
 
 		#region Private Variables
 		[Header("Runtime Debug")]
+		public int LaneIndex;
 		public GridTile[] gridTiles;
 		#endregion
 
 		#region Unity Methods
 		private void Awake() {
 			gridTiles = this.transform.GetComponentsInChildren<GridTile>(false);
+			for (int i = 0; i < gridTiles.Length; i++) {
+				gridTiles[i].AssignedLane = this.transform.GetSiblingIndex();
+			}
 		}
 		#endregion
 

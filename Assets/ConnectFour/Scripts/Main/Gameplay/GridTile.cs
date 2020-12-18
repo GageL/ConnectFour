@@ -25,6 +25,7 @@ namespace C4 {
 		private Button localButton;
 
 		[Header("Runtime Debug")]
+		public int AssignedLane;
 		public bool IsPopulated;
 		public bool IsPlayerOwned;
 		#endregion
@@ -70,7 +71,7 @@ namespace C4 {
 			IsPopulated = true;
 			IsPlayerOwned = GameplayManager.Instance.IsPlayerTurn;
 
-			this.transform.GetChild(0).gameObject.SetActive(true);
+			//this.transform.GetChild(0).gameObject.SetActive(true);
 			this.transform.GetChild(0).gameObject.GetComponent<Image>().color = (IsPlayerOwned ? GameplayManager.Instance.PlayerTeamColor : GameplayManager.Instance.AITeamColor);
 			this.transform.GetChild(0).GetChild(0).gameObject.SetActive(false);
 

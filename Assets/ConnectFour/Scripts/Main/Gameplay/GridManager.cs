@@ -17,7 +17,7 @@ namespace C4 {
 		#endregion
 
 		#region Public Variables
-
+		public Transform[] LanePlacements;
 		#endregion
 
 		#region Private Variables

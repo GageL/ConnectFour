@@ -18,7 +18,7 @@ namespace C4 {
 		#endregion
 
 		#region Public Variables
-
+		public GameObject PlacementTile;
 		#endregion
 
 		#region Private Variables
@@ -29,6 +29,8 @@ namespace C4 {
 		public bool IsPlayerTurn;
 		public int ActionsTaken;
 		public int CurrentRound;
+		public bool IsTileDropping;
+		public GridTile DestinationTile;
 
 		private Coroutine aiThinkProcess;
 		#endregion
@@ -36,6 +38,24 @@ namespace C4 {
 		#region Unity Methods
 		private void Awake() {
 
+		}
+
+		private void Update() {
+			if (IsTileDropping) {
+				PlacementTile.transform.GetChild(0).GetComponent<Image>().color = IsPlayerTurn ? PlayerTeamColor : AITeamColor;
+				PlacementTile.SetActive(true);
+				if (IsTileDropping) {
+					PlacementTile.transform.position = Vector3.MoveTowards(PlacementTile.transform.position, DestinationTile.transform.position, 1.5f);
+					if (Vector3.Distance(PlacementTile.transform.position, DestinationTile.transform.position) <= 0.1f) {
+						DestinationTile.transform.GetChild(0).gameObject.SetActive(true);
+						AnalyzeBoardState();
+						IsTileDropping = false;
+						DestinationTile = null;
+					}
+				}
+			} else {
+				PlacementTile.SetActive(false);
+			}
 		}
 		#endregion
 
@@ -69,12 +89,15 @@ namespace C4 {
 		}
 
 		public void ReceiveTileSelection(GridTile gridTile) {
+			PlacementTile.transform.position = GridManager.Instance.LanePlacements[gridTile.AssignedLane].transform.position;
+			DestinationTile = gridTile;
+			IsTileDropping = true;
 			GridManager.Instance.HideTiles();
 		}
 
 		public void EndPlayerTurn() {
 			GridManager.Instance.HideTiles();
-			LogTurnAction(true);
+			LogTurnAction();
 			StartAITurn();
 		}
 
@@ -87,7 +110,7 @@ namespace C4 {
 		}
 
 		public void EndAITurn() {
-			LogTurnAction(false);
+			LogTurnAction();
 			StartPlayerTurn();
 		}
 		#endregion
@@ -102,11 +125,13 @@ namespace C4 {
 					selTile.SelectTile();
 				}
 			}
-			yield return new WaitForSeconds(.5f);
-			EndAITurn();
 		}
 
-		private void LogTurnAction(bool isPlayer) {
+		private void GetMatchingOrRandomTile() {
+
+		}
+
+		private void LogTurnAction() {
 			IsPlayerTurn = !IsPlayerTurn;
 			ActionsTaken++;
 			if (ActionsTaken == 2) {
@@ -114,6 +139,61 @@ namespace C4 {
 				ActionsTaken = 0;
 			}
 			OnAction?.Invoke();
+		}
+
+		private void AnalyzeBoardState() {
+			Debug.Log("AnalyzeBoardState");
+			bool foundWinScanario = false;
+
+			//Vertical
+			int verticalMatches = 0;
+			if (!foundWinScanario) {
+				for (int lane = 0; lane < GridManager.Instance.gridLanes.Length; lane++) { //Left->Right
+					for (int tile = GridManager.Instance.gridLanes[lane].gridTiles.Length; tile-- > 0;) { //Bottom->Top
+						if (GridManager.Instance.gridLanes[lane].gridTiles[tile].IsPopulated) {
+							if (IsPlayerTurn) {
+								if (GridManager.Instance.gridLanes[lane].gridTiles[tile].IsPlayerOwned) {
+									verticalMatches++;
+									if (verticalMatches == 4) {
+										foundWinScanario = true;
+										break;
+									}
+								} else {
+									verticalMatches = 0;
+								}
+							}
+						}
+					}
+					if (foundWinScanario) {
+						break;
+					}
+				}
+			}
+
+			//Horizontal
+
+			//Diagonal
+			//https://stackoverflow.com/questions/32770321/connect-4-check-for-a-win-algorithm
+
+			if (foundWinScanario) {
+				SetWinState();
+			} else {
+				Debug.Log("All losers");
+				if (DestinationTile.IsPlayerOwned) {
+					EndPlayerTurn();
+				} else {
+					EndAITurn();
+				}
+			}
+		}
+
+		private void SetWinState() {
+			Debug.Log("Winner winner");
+			if (IsPlayerTurn) {
+
+			} else {
+
+			}
 		}
 		#endregion
 	}

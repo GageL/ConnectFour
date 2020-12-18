@@ -24,7 +24,6 @@ namespace C4 {
 		#region Private Variables
 		[SerializeField] private Button pauseButton;
 		[SerializeField] private TMP_Text roundText;
-		[SerializeField] private Button endTurnButton;
 		[SerializeField] private TMP_Text turnText;
 		[SerializeField] private GameObject pauseMenuHolder;
 		[SerializeField] private Button pauseMenuResumeButton;
@@ -42,19 +41,19 @@ namespace C4 {
 			pauseButton.onClick.AddListener(() => PauseButtonClick());
 			pauseMenuResumeButton.onClick.AddListener(() => PauseMenuResumeButtonClick());
 			pauseMenuQuitButton.onClick.AddListener(() => PauseMenuQuitButtonClick());
-			endTurnButton.onClick.AddListener(() => EndTurnButtonClick());
 		}
 
 		private void OnDisable() {
 			pauseButton.onClick.RemoveListener(() => PauseButtonClick());
 			pauseMenuResumeButton.onClick.RemoveListener(() => PauseMenuResumeButtonClick());
 			pauseMenuQuitButton.onClick.RemoveListener(() => PauseMenuQuitButtonClick());
-			endTurnButton.onClick.RemoveListener(() => EndTurnButtonClick());
 		}
 
 		private void Update() {
 			roundText.text = $"Round: {GameplayManager.Instance.CurrentRound}";
+			roundText.transform.parent.GetComponent<TMP_Text>().text = $"Round: {GameplayManager.Instance.CurrentRound}";
 			turnText.text = $"Turn: {(GameplayManager.Instance.IsPlayerTurn ? "Player" : "Bot")}";
+			turnText.transform.parent.GetComponent<TMP_Text>().text = $"Turn: {(GameplayManager.Instance.IsPlayerTurn ? "Player" : "Bot")}";
 		}
 		#endregion
 
