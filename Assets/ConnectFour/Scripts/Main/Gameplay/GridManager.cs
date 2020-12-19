@@ -26,7 +26,8 @@ namespace C4 {
 		#endregion
 
 		#region Unity Methods
-		private void Awake() {
+		public override void Awake() {
+			base.Awake();
 			gridLanes = this.GetComponentsInChildren<GridLane>(false);
 		}
 		#endregion

@@ -37,7 +37,8 @@ namespace C4 {
 		#endregion
 
 		#region Unity Methods
-		private void Awake() {
+		public override void Awake() {
+			base.Awake();
 			localPlayerNameInput.text = "Long John Shivver";
 			string[] botNames = {
 				"Doris Shutt",
