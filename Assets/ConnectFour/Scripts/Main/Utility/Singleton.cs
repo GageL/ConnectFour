@@ -21,14 +21,11 @@ namespace GLucas {
 			}
 		}
 		public virtual void Awake() {
-			if (_instance != null) {
+			if (_instance != this) {
 				Destroy(gameObject);
 				return;
 			}
 			_instance = GetComponent<T>();
-			if (_instance == null) {
-				return;
-			}
 		}
 	}
 
@@ -37,6 +34,7 @@ namespace GLucas {
 		static T _instance;
 		public static T Instance {
 			get {
+				Debug.Log("here");
 				if (_instance == null) {
 					_instance = (T)FindObjectOfType(typeof(T));
 					if (_instance == null) {
@@ -49,15 +47,13 @@ namespace GLucas {
 			}
 		}
 		public virtual void Awake() {
-			if (_instance != null) {
+			if (_instance != this) {
+				Debug.Log("killed");
 				Destroy(gameObject);
 				return;
 			}
 			_instance = GetComponent<T>();
 			DontDestroyOnLoad(gameObject);
-			if (_instance == null) {
-				return;
-			}
 		}
 	}
 }

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Audio;
 using GLucas;
 using TMPro;
 
@@ -30,17 +31,23 @@ namespace C4 {
 		[SerializeField] private Button pauseMenuResumeButton;
 		[SerializeField] private Button pauseRestartButton;
 		[SerializeField] private Button pauseMenuQuitButton;
+		[SerializeField] private AudioMixer globalAudioMixer;
+		[SerializeField] private Slider musicVolumeSlider;
+		[SerializeField] private Slider effectsVolumeSlider;
 
 		private Coroutine onGameStartProcess;
 		private Coroutine onGameEndProcess;
 		#endregion
 
 		#region Unity Methods
-		private void Awake() {
+		public override void Awake() {
+			base.Awake();
 			gameStatusText.color = new Color(gameStatusText.color.r, gameStatusText.color.g, gameStatusText.color.b, 0);
 			roundText.text = $"Round: {GameplayManager.Instance.CurrentRound}";
 			turnText.text = $"Turn: {(GameplayManager.Instance.IsPlayerTurn ? "Player" : "Bot")}";
 			pauseMenuHolder.SetActive(false);
+			musicVolumeSlider.value = 1f;
+			effectsVolumeSlider.value = 1f;
 		}
 
 		private void OnEnable() {
@@ -117,7 +124,13 @@ namespace C4 {
 		#endregion
 
 		#region Public Methods
+		public void SetMusicVolume(float value) {
+			globalAudioMixer.SetFloat("MusicVolume", Mathf.Log10(value) * 20);
+		}
 
+		public void SetEffectsVolume(float value) {
+			globalAudioMixer.SetFloat("EffectsVolume", Mathf.Log10(value) * 20);
+		}
 		#endregion
 
 		#region Local Methods
