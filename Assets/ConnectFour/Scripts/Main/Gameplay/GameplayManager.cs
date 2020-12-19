@@ -57,8 +57,7 @@ namespace C4 {
 		#endregion
 
 		#region Unity Methods
-		public override void Awake() {
-			base.Awake();
+		public void Awake() {
 			PlacementTile.SetActive(false);
 		}
 

@@ -40,8 +40,7 @@ namespace C4 {
 		#endregion
 
 		#region Unity Methods
-		public override void Awake() {
-			base.Awake();
+		public void Awake() {
 			gameStatusText.color = new Color(gameStatusText.color.r, gameStatusText.color.g, gameStatusText.color.b, 0);
 			roundText.text = $"Round: {GameplayManager.Instance.CurrentRound}";
 			turnText.text = $"Turn: {(GameplayManager.Instance.IsPlayerTurn ? "Player" : "Bot")}";
@@ -57,6 +56,7 @@ namespace C4 {
 			pauseMenuQuitButton.onClick.AddListener(() => PauseMenuQuitButtonClick());
 
 			GameplayManager.ON_GAME_START += OnGameStart;
+			GameplayManager.ON_END_TURN += OnEndTurn;
 			GameplayManager.ON_GAME_END += OnGameEnd;
 		}
 
@@ -67,14 +67,12 @@ namespace C4 {
 			pauseMenuQuitButton.onClick.RemoveListener(() => PauseMenuQuitButtonClick());
 
 			GameplayManager.ON_GAME_START -= OnGameStart;
+			GameplayManager.ON_END_TURN -= OnEndTurn;
 			GameplayManager.ON_GAME_END -= OnGameEnd;
 		}
 
 		private void Update() {
-			roundText.text = $"Round: {GameplayManager.Instance.CurrentRound}";
-			roundText.transform.parent.GetComponent<TMP_Text>().text = $"Round: {GameplayManager.Instance.CurrentRound}";
-			turnText.text = $"Turn: {(GameplayManager.Instance.IsPlayerTurn ? GameplayManager.Instance.PlayerName : GameplayManager.Instance.BotName)}";
-			turnText.transform.parent.GetComponent<TMP_Text>().text = $"Turn: {(GameplayManager.Instance.IsPlayerTurn ? GameplayManager.Instance.PlayerName : GameplayManager.Instance.BotName)}";
+			
 		}
 		#endregion
 
@@ -85,6 +83,10 @@ namespace C4 {
 				onGameStartProcess = null;
 			}
 			onGameStartProcess = StartCoroutine(OnGameStartProcess());
+		}
+
+		private void OnEndTurn() {
+			SetUIText();
 		}
 
 		private void OnGameEnd() {
@@ -135,6 +137,7 @@ namespace C4 {
 
 		#region Local Methods
 		private IEnumerator OnGameStartProcess() {
+			SetUIText();
 			gameStatusText.color = new Color(gameStatusText.color.r, gameStatusText.color.g, gameStatusText.color.b, 0);
 			gameStatusText.text = "Match started, good luck!";
 			float alpha = 0;
@@ -149,6 +152,13 @@ namespace C4 {
 				gameStatusText.color = new Color(gameStatusText.color.r, gameStatusText.color.g, gameStatusText.color.b, alpha);
 				yield return new WaitForEndOfFrame();
 			}
+		}
+
+		private void SetUIText() {
+			roundText.text = $"Round: {GameplayManager.Instance.CurrentRound}";
+			roundText.transform.parent.GetComponent<TMP_Text>().text = $"Round: {GameplayManager.Instance.CurrentRound}";
+			turnText.text = $"Turn: {(GameplayManager.Instance.IsPlayerTurn ? GameplayManager.Instance.PlayerName : GameplayManager.Instance.BotName)}";
+			turnText.transform.parent.GetComponent<TMP_Text>().text = $"Turn: {(GameplayManager.Instance.IsPlayerTurn ? GameplayManager.Instance.PlayerName : GameplayManager.Instance.BotName)}";
 		}
 
 		private IEnumerator OnGameEndProcess() {

@@ -34,8 +34,7 @@ namespace C4 {
 		#endregion
 
 		#region Unity Methods
-		public override void Awake() {
-			base.Awake();
+		public void Awake() {
 			musicAudioSource.volume = 0;
 			StartCoroutine(FadeTrackProcess(false));
 		}

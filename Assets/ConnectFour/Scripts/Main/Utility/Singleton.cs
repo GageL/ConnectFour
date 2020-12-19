@@ -10,50 +10,17 @@ namespace GLucas {
 		public static T Instance {
 			get {
 				if (_instance == null) {
-					_instance = (T)FindObjectOfType(typeof(T));
-					if (_instance == null) {
-						var obj = new GameObject();
-						obj.name = typeof(T).ToString();
-						_instance = obj.AddComponent<T>();
+					T obj = (T)FindObjectOfType(typeof(T));
+					if (obj == null) {
+						Debug.LogWarning("Cannot find singleton of type '" + typeof(T).Name + "'");
+					} else {
+						_instance = obj;
 					}
+					return _instance;
+				} else {
+					return _instance;
 				}
-				return _instance;
 			}
-		}
-		public virtual void Awake() {
-			if (_instance != this) {
-				Destroy(gameObject);
-				return;
-			}
-			_instance = GetComponent<T>();
-		}
-	}
-
-	public abstract class SingletonDND<T> : MonoBehaviour where T : MonoBehaviour {
-
-		static T _instance;
-		public static T Instance {
-			get {
-				Debug.Log("here");
-				if (_instance == null) {
-					_instance = (T)FindObjectOfType(typeof(T));
-					if (_instance == null) {
-						var obj = new GameObject();
-						obj.name = typeof(T).ToString();
-						_instance = obj.AddComponent<T>();
-					}
-				}
-				return _instance;
-			}
-		}
-		public virtual void Awake() {
-			if (_instance != this) {
-				Debug.Log("killed");
-				Destroy(gameObject);
-				return;
-			}
-			_instance = GetComponent<T>();
-			DontDestroyOnLoad(gameObject);
 		}
 	}
 }
