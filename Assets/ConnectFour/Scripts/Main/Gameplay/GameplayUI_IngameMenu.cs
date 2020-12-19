@@ -136,7 +136,11 @@ namespace C4 {
 		}
 
 		private IEnumerator OnGameEndProcess() {
-			gameStatusText.text = $"Winner, {(GameplayManager.Instance.IsPlayerTurn ? GameplayManager.Instance.PlayerName : "Bot")}! <size={gameStatusText.fontSize/3}><i>({GameplayManager.Instance.WinDirectionType.ToString()})</i></size>";
+			if (!GameplayManager.Instance.WinStateFound) {
+				gameStatusText.text = $"Stalemate!";
+			} else {
+				gameStatusText.text = $"Winner, {(GameplayManager.Instance.IsPlayerTurn ? GameplayManager.Instance.PlayerName : "Bot")}! <size={gameStatusText.fontSize / 3}><i>({GameplayManager.Instance.WinDirectionType.ToString()})</i></size>";
+			}
 			float alpha = 0;
 			while (alpha < 1f) {
 				alpha += 1 * Time.deltaTime;

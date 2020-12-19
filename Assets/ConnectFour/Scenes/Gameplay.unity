@@ -8412,9 +8412,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PlacementTile: {fileID: 1208023088}
-  tilePlaceSpeed: 20
+  tilePlaceSpeed: 1600
   PlayerName: 
   PlayerTeamColor: {r: 0, g: 0, b: 0, a: 0}
+  BotName: 
   AITeamColor: {r: 0, g: 0, b: 0, a: 0}
   IsPlayerTurn: 0
   ActionsTaken: 0

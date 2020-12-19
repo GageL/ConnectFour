@@ -45,7 +45,7 @@ namespace C4 {
 		public bool IsPlayerTurn;
 		public int ActionsTaken;
 		public int CurrentRound;
-		public GridTile DestinationTile;
+		public GridTile CurrentDestinationTile;
 		public bool WinStateFound;
 		public WinDirectionType WinDirectionType;
 
@@ -55,8 +55,11 @@ namespace C4 {
 
 		#region Unity Methods
 		private void Awake() {
-			Application.targetFrameRate = 30;
 			PlacementTile.SetActive(false);
+		}
+
+		private void Update() {
+			Application.targetFrameRate = 30;
 		}
 		#endregion
 
@@ -105,7 +108,7 @@ namespace C4 {
 
 		public void ReceiveTileSelection(GridTile gridTile) {
 			PlacementTile.transform.position = GridManager.Instance.LanePlacements[gridTile.AssignedLane].transform.position;
-			DestinationTile = gridTile;
+			CurrentDestinationTile = gridTile;
 			StartTileDropProcess();
 			GridManager.Instance.HideTiles();
 			ON_TILE_SELECT?.Invoke();
@@ -114,6 +117,10 @@ namespace C4 {
 		public void EndPlayerTurn() { //Removed the manual player linked button functionality instead for more decisive gameplay
 			GridManager.Instance.HideTiles();
 			EndGlobalTurn();
+			if (CurrentRound == 22) {
+				SetWinState();
+				return;
+			}
 			StartAITurn();
 		}
 
@@ -127,6 +134,10 @@ namespace C4 {
 
 		public void EndAITurn() {
 			EndGlobalTurn();
+			if (CurrentRound == 22) {
+				SetWinState();
+				return;
+			}
 			StartPlayerTurn();
 		}
 		#endregion
@@ -140,19 +151,19 @@ namespace C4 {
 			tileDropProcess = StartCoroutine(TileDropProcess());
 		}
 
-		private IEnumerator TileDropProcess() {
+		private IEnumerator TileDropProcess() { //Make this an animation and just wait animation time (add bounce effect to anim)
 			bool isTileDropping = true;
 			do {
 				PlacementTile.transform.GetChild(0).GetComponent<Image>().color = IsPlayerTurn ? PlayerTeamColor : AITeamColor;
 				PlacementTile.SetActive(true);
 				if (isTileDropping) {
-					//PlacementTile.transform.position = Vector3.MoveTowards(PlacementTile.transform.position, DestinationTile.transform.position, tilePlaceSpeed);
-					PlacementTile.transform.position = StaticUtilities.MoveTowards(PlacementTile.transform.position, DestinationTile.transform.position, tilePlaceSpeed);
-					if (StaticUtilities.DistanceThreshold(PlacementTile.transform.position, DestinationTile.transform.position, 0.1f)) {
-						DestinationTile.PlaceTile();
+					PlacementTile.transform.position = Vector3.MoveTowards(PlacementTile.transform.position, CurrentDestinationTile.transform.position, tilePlaceSpeed * Time.deltaTime);
+					//PlacementTile.transform.position = StaticUtilities.MoveTowards(PlacementTile.transform.position, DestinationTile.transform.position, tilePlaceSpeed);
+					if (StaticUtilities.DistanceThreshold(PlacementTile.transform.position, CurrentDestinationTile.transform.position, 0.1f)) {
+						CurrentDestinationTile.PlaceTile();
 						AnalyzeBoardState();
 						isTileDropping = false;
-						DestinationTile = null;
+						CurrentDestinationTile = null;
 						ON_TILE_PLACED?.Invoke();
 					}
 				}
@@ -162,18 +173,60 @@ namespace C4 {
 		}
 
 		private IEnumerator AIThinkProcess() {
-			yield return new WaitForEndOfFrame(); //Make the bot move instantly
-			GridTile[] gridTiles = GridManager.Instance.GetViableGridTiles();
-			if (gridTiles != null && gridTiles.Length > 0) {
-				GridTile selTile = gridTiles[UnityEngine.Random.Range(0, gridTiles.Length)];
-				if (selTile != null) {
-					selTile.SelectTile();
+			yield return new WaitForEndOfFrame(); //Make the bot move instantly (use waitseconds for think behavior)
+			AISelectBestTile();
+
+		}
+
+		private void AISelectBestTile() {
+			GridTile selectedTile = null;
+
+			selectedTile = AIVerticalStackCheck();
+
+			//Cant find a good tile placement
+			if (selectedTile == null) {
+				GridTile[] viableGridTiles = GridManager.Instance.GetViableGridTiles();
+				if (viableGridTiles != null && viableGridTiles.Length > 0) {
+					selectedTile = viableGridTiles[UnityEngine.Random.Range(0, viableGridTiles.Length)];
+					if (selectedTile != null) {
+						selectedTile.SelectTile();
+					}
 				}
+			} else {
+				selectedTile.SelectTile();
 			}
 		}
 
-		private void GetMatchingOrRandomTile() {
-
+		private GridTile AIVerticalStackCheck() {
+			GridTile foundTile = null;
+			int verticalMatches = 0;
+			for (int lane = 0; lane < GridManager.Instance.gridLanes.Length; lane++) { //Left->Right
+				verticalMatches = 0;
+				for (int tile = GridManager.Instance.gridLanes[lane].gridTiles.Length; tile-- > 0;) { //Bottom->Top
+					if (GridManager.Instance.gridLanes[lane].gridTiles[tile].IsPopulated) {
+						if (!GridManager.Instance.gridLanes[lane].gridTiles[tile].IsPlayerOwned) {
+							verticalMatches++;
+							if (verticalMatches >= 1) {
+								if (tile > 0) {
+									if (!GridManager.Instance.gridLanes[lane].gridTiles[tile - 1].IsPopulated) {
+										foundTile = GridManager.Instance.gridLanes[lane].gridTiles[tile - 1];
+										break;
+									}
+								}
+							}
+						} else {
+							verticalMatches = 0;
+						}
+					} else {
+						verticalMatches = 0;
+					}
+				}
+				if (foundTile) {
+					Debug.Log($"Found tile {foundTile.gameObject.name}/{foundTile.AssignedLane}");
+					break;
+				}
+			}
+			return foundTile;
 		}
 
 		private void EndGlobalTurn() {
@@ -189,23 +242,23 @@ namespace C4 {
 		private void AnalyzeBoardState() {
 			//Vertical
 			if (!WinStateFound) {
-				WinStateFound = VerticalCheck();
+				WinStateFound = VerticalWinCheck();
 			}
 
 			//Horizontal
 			if (!WinStateFound) {
-				WinStateFound = HorizontalCheck();
+				WinStateFound = HorizontalWinCheck();
 			}
 
 			//Diagonal
 			if (!WinStateFound) {
-				WinStateFound = DiagonalCheck();
+				WinStateFound = DiagonalWinCheck();
 			}
 
 			CheckWinState();
 		}
 
-		private bool VerticalCheck() {
+		private bool VerticalWinCheck() {
 			bool foundWinScenario = false;
 			int verticalMatches = 0;
 			for (int lane = 0; lane < GridManager.Instance.gridLanes.Length; lane++) { //Left->Right
@@ -246,10 +299,11 @@ namespace C4 {
 			return foundWinScenario;
 		}
 
-		private bool HorizontalCheck() {
+		private bool HorizontalWinCheck() {
 			bool foundWinScenario = false;
 			int horizontalMatches = 0;
 			for (int tile = 6; tile-- > 0;) { //Bottom->Top
+				horizontalMatches = 0;
 				for (int lane = 0; lane < GridManager.Instance.gridLanes.Length; lane++) { //Left->Right
 					if (GridManager.Instance.gridLanes[lane].gridTiles[tile].IsPopulated) {
 						if (IsPlayerTurn) {
@@ -286,7 +340,7 @@ namespace C4 {
 			return foundWinScenario;
 		}
 
-		private bool DiagonalCheck() {
+		private bool DiagonalWinCheck() {
 			bool foundWinScenario = false;
 			for (int tile = 6; tile-- > 0;) { //Bottom->Top
 				for (int lane = GridManager.Instance.gridLanes.Length; lane-- > 0;) { //Right->Left
@@ -359,7 +413,7 @@ namespace C4 {
 			if (WinStateFound) {
 				SetWinState();
 			} else {
-				if (DestinationTile.IsPlayerOwned) {
+				if (CurrentDestinationTile.IsPlayerOwned) {
 					EndPlayerTurn();
 				} else {
 					EndAITurn();

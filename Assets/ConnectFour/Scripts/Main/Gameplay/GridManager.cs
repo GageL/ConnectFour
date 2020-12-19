@@ -67,6 +67,19 @@ namespace C4 {
 			}
 			return viableTiles.ToArray();
 		}
+
+		public GridTile[] GetAIGridTiles() {
+			List<GridTile> aiTiles = new List<GridTile>();
+			for (int a = 0; a < gridLanes.Length; a++) {
+				for (int b = gridLanes[a].gridTiles.Length; b-- > 0;) {
+					if (gridLanes[a].gridTiles[b].IsPopulated && !gridLanes[a].gridTiles[b].IsPlayerOwned) {
+						aiTiles.Add(gridLanes[a].gridTiles[b]);
+						break;
+					}
+				}
+			}
+			return aiTiles.ToArray();
+		}
 		#endregion
 
 		#region Local Methods
