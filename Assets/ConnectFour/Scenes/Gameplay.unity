@@ -6542,7 +6542,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.7254902, g: 0.88235295, b: 1, a: 0.95686275}
+  m_Color: {r: 0.43529412, g: 0.6313726, b: 0.78431374, a: 0.95686275}
   m_RaycastTarget: 1
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -8412,7 +8412,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PlacementTile: {fileID: 1208023088}
-  tilePlaceSpeed: 1600
+  tilePlaceSpeed: 20
+  minAIStackAmount: 1
+  allowViableTileRandomAIChoice: 0
   PlayerName: 
   PlayerTeamColor: {r: 0, g: 0, b: 0, a: 0}
   BotName: 
@@ -8420,7 +8422,7 @@ MonoBehaviour:
   IsPlayerTurn: 0
   ActionsTaken: 0
   CurrentRound: 0
-  DestinationTile: {fileID: 0}
+  CurrentDestinationTile: {fileID: 0}
   WinStateFound: 0
   WinDirectionType: 0
 --- !u!4 &646536774

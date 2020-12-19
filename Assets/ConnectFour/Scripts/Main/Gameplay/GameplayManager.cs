@@ -35,7 +35,10 @@ namespace C4 {
 		#endregion
 
 		#region Private Variables
+		[Header("Settings")]
 		[SerializeField] private float tilePlaceSpeed = 1.5f;
+		[SerializeField] [Range(1, 3)] private int minAIStackAmount = 1; //When the ai will start considering stacking
+		[SerializeField] private bool allowViableTileRandomAIChoice; //Meant to add additional variable to v/h/d viable stack options
 
 		[Header("Runtime Debug")]
 		public string PlayerName;
@@ -157,7 +160,7 @@ namespace C4 {
 				PlacementTile.transform.GetChild(0).GetComponent<Image>().color = IsPlayerTurn ? PlayerTeamColor : AITeamColor;
 				PlacementTile.SetActive(true);
 				if (isTileDropping) {
-					PlacementTile.transform.position = Vector3.MoveTowards(PlacementTile.transform.position, CurrentDestinationTile.transform.position, tilePlaceSpeed * Time.deltaTime);
+					PlacementTile.transform.position = Vector3.MoveTowards(PlacementTile.transform.position, CurrentDestinationTile.transform.position, tilePlaceSpeed);
 					//PlacementTile.transform.position = StaticUtilities.MoveTowards(PlacementTile.transform.position, DestinationTile.transform.position, tilePlaceSpeed);
 					if (StaticUtilities.DistanceThreshold(PlacementTile.transform.position, CurrentDestinationTile.transform.position, 0.1f)) {
 						CurrentDestinationTile.PlaceTile();
@@ -173,20 +176,71 @@ namespace C4 {
 		}
 
 		private IEnumerator AIThinkProcess() {
-			yield return new WaitForEndOfFrame(); //Make the bot move instantly (use waitseconds for think behavior)
+			yield return new WaitForSeconds(.5f); //Allow the player a moment to let the ai "think"
 			AISelectBestTile();
 
 		}
 
 		private void AISelectBestTile() {
+			GridTile verticalTile = null;
+			GridTile horizontalTile = null;
+			GridTile diagonalTile = null;
 			GridTile selectedTile = null;
 
-			selectedTile = AIVerticalStackCheck();
+			verticalTile = AIVerticalStackCheck();
+			horizontalTile = AIHorizontalStackCheck();
 
-			//Cant find a good tile placement
-			if (selectedTile == null) {
+			int viableCount = 0;
+			if (verticalTile != null) {
+				viableCount++;
+				if (horizontalTile != null) {
+					viableCount++;
+				}
+				if (diagonalTile != null) {
+					viableCount++;
+				}
+				if (viableCount == 1) {
+					Debug.Log("AI chose verticalTile");
+					selectedTile = verticalTile;
+				} else {
+					Debug.Log($"AI viableCount = {viableCount}");
+					int randTile = 0;
+					if (allowViableTileRandomAIChoice) {
+						randTile = UnityEngine.Random.Range(0, viableCount + 1);
+					} else {
+						randTile = UnityEngine.Random.Range(0, viableCount);
+					}
+					Debug.Log($"AI randTile = {randTile}");
+					switch (randTile) {
+						case 0:
+							Debug.Log("AI chose verticalTile");
+							selectedTile = verticalTile;
+							break;
+						case 1:
+							if (horizontalTile != null) {
+								Debug.Log("AI chose horizontalTile");
+								selectedTile = horizontalTile;
+							}
+							if (diagonalTile != null) {
+								Debug.Log("AI chose diagonalTile");
+								selectedTile = diagonalTile;
+							}
+							break;
+						case 2:
+							Debug.Log("AI chose diagonalTile");
+							selectedTile = diagonalTile;
+							break;
+						case 3:
+							selectedTile = null;
+							break;
+					}
+				}
+			}
+
+			if (selectedTile == null) { //Cant find a good tile placement
 				GridTile[] viableGridTiles = GridManager.Instance.GetViableGridTiles();
 				if (viableGridTiles != null && viableGridTiles.Length > 0) {
+					Debug.Log("AI chose random");
 					selectedTile = viableGridTiles[UnityEngine.Random.Range(0, viableGridTiles.Length)];
 					if (selectedTile != null) {
 						selectedTile.SelectTile();
@@ -206,9 +260,9 @@ namespace C4 {
 					if (GridManager.Instance.gridLanes[lane].gridTiles[tile].IsPopulated) {
 						if (!GridManager.Instance.gridLanes[lane].gridTiles[tile].IsPlayerOwned) {
 							verticalMatches++;
-							if (verticalMatches >= 1) {
-								if (tile > 0) {
-									if (!GridManager.Instance.gridLanes[lane].gridTiles[tile - 1].IsPopulated) {
+							if (verticalMatches >= minAIStackAmount) {
+								if (tile > 0) { //Make sure that we are not checking a non existing tile
+									if (!GridManager.Instance.gridLanes[lane].gridTiles[tile - 1].IsPopulated) { //Need to make sure the tile above the current tile is not populated
 										foundTile = GridManager.Instance.gridLanes[lane].gridTiles[tile - 1];
 										break;
 									}
@@ -222,7 +276,47 @@ namespace C4 {
 					}
 				}
 				if (foundTile) {
-					Debug.Log($"Found tile {foundTile.gameObject.name}/{foundTile.AssignedLane}");
+					Debug.Log($"Found vertical tile {foundTile.gameObject.name}/{foundTile.AssignedLane}");
+					break;
+				}
+			}
+			return foundTile;
+		}
+
+		private GridTile AIHorizontalStackCheck() {
+			GridTile foundTile = null;
+			int horizontalMatches = 0;
+			for (int tile = 6; tile-- > 0;) { //Bottom->Top
+				horizontalMatches = 0;
+				for (int lane = 0; lane < GridManager.Instance.gridLanes.Length; lane++) { //Left->Right
+					if (GridManager.Instance.gridLanes[lane].gridTiles[tile].IsPopulated) {
+						if (!GridManager.Instance.gridLanes[lane].gridTiles[tile].IsPlayerOwned) {
+							horizontalMatches++;
+							if (horizontalMatches >= minAIStackAmount) {
+								if (lane > 0) { //Make sure that we are not checking a non existing left lane
+									if (!GridManager.Instance.gridLanes[lane - 1].gridTiles[tile].IsPopulated && //Need to check that the tile on the lane to the left is not populated
+										((tile + 1 <= 5) && GridManager.Instance.gridLanes[lane - 1].gridTiles[tile + 1].IsPopulated)) { //Need to check if the tile on the lane to the left and down 1 exists and is populated
+										foundTile = GridManager.Instance.gridLanes[lane - 1].gridTiles[tile];
+										break;
+									}
+								}
+								if (lane < 5) { //Make sure that we are not checking a non existing right lane
+									if (!GridManager.Instance.gridLanes[lane + 1].gridTiles[tile].IsPopulated && //Need to check that the tile on the lane to the right is not populated
+										((tile + 1 <= 5) && GridManager.Instance.gridLanes[lane + 1].gridTiles[tile + 1].IsPopulated)) { //Need to check if the tile on the lane to the right and down 1 exists and is populated
+										foundTile = GridManager.Instance.gridLanes[lane + 1].gridTiles[tile];
+										break;
+									}
+								}
+							}
+						} else {
+							horizontalMatches = 0;
+						}
+					} else {
+						horizontalMatches = 0;
+					}
+				}
+				if (foundTile) {
+					Debug.Log($"Found horizontal tile {foundTile.gameObject.name}/{foundTile.AssignedLane}");
 					break;
 				}
 			}

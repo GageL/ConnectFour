@@ -1,3 +1,4 @@
-* Demonstrate using both direct UI Button onClick listener via code as well as baked UnityEvent (different use cases)
-* Considerations, adding or removing elements in the palette can cause issues with indexing and will want to make this more baked for ease of use
+Things to add/amend:
 
+1) Make AI tile placement "know" when its a no win placement to keep stacking any direction in general (trivial) (est ~1hr)
+2) Add AI diagonal stacking tile placement logic instead of just vertical, horizontal and random decision (trivial) (est ~1hr)

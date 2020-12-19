@@ -22,4 +22,4 @@ Extra Credit
 
 //● Detect when a game is won.
 
-● Build a simple algorithm that makes optimal decisions to win and employs some strategy.
+//● Build a simple algorithm that makes optimal decisions to win and employs some strategy.
