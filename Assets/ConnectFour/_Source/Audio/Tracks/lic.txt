@@ -14,17 +14,20 @@ Song(s): Wheels, Snappy
 FX ↓
 =====================
 License: https://creativecommons.org/publicdomain/zero/1.0/legalcode
+License: https://creativecommons.org/licenses/by-nc/3.0/legalcode
 
 Source: https://freesound.org/
-
+Source: https://freesound.org/people/milton./sounds/86865/
 
 
 =====================
 Images ↓
 =====================
 License: https://creativecommons.org/publicdomain/zero/1.0/legalcode
+License: https://pixabay.com/service/terms/#license
 
 Source: https://www.pexels.com/
+Source: https://www.pixabay.com/
 
 
 
@@ -34,3 +37,10 @@ Sprites ↓
 License: https://creativecommons.org/publicdomain/zero/1.0/legalcode
 
 Source: https://www.flaticon.com/
+
+
+
+=====================
+Info
+=====================
+No edits were made to any attributed files

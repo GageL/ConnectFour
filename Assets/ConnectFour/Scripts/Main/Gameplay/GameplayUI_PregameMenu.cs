@@ -39,6 +39,21 @@ namespace C4 {
 		#region Unity Methods
 		private void Awake() {
 			localPlayerNameInput.text = "Long John Shivver";
+			string[] botNames = {
+				"Doris Shutt",
+				"Stan Dupp",
+				"Yullbe Allwright",
+				"Kay Oss",
+				"Levy Tate",
+				"Maxi Mum",
+				"Rhoda Camel",
+				"Ivana Fly",
+				"Holli Wood",
+				"Joe King"
+			};
+			string botName = botNames[UnityEngine.Random.Range(0, 10)];
+			GameplayManager.Instance.BotName = botName;
+
 			playerSelectedColorImage.color = playerColorButtonsHolder.GetChild(selPlayerColorIdx).GetComponent<Image>().color;
 			aiSelectedColorImage.color = playerColorButtonsHolder.GetChild(selAIColorIdx).GetComponent<Image>().color;
 			errorText.text = string.Empty;
@@ -53,7 +68,7 @@ namespace C4 {
 		}
 
 		private void Start() {
-
+			AudioManager.Instance.PlayLobbyTrack();
 		}
 		#endregion
 
@@ -69,6 +84,7 @@ namespace C4 {
 		}
 
 		private void StartGameButtonClick() {
+			AudioManager.Instance.PlayButtonClick();
 			if (string.IsNullOrEmpty(localPlayerNameInput.text) || string.IsNullOrWhiteSpace(localPlayerNameInput.text)) {
 				errorText.text = "Cannot start until the local player is named";
 				return;

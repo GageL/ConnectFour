@@ -71,13 +71,17 @@ namespace C4 {
 			IsPopulated = true;
 			IsPlayerOwned = GameplayManager.Instance.IsPlayerTurn;
 
-			//this.transform.GetChild(0).gameObject.SetActive(true);
+			this.transform.GetChild(0).gameObject.SetActive(false);
 			this.transform.GetChild(0).gameObject.GetComponent<Image>().color = (IsPlayerOwned ? GameplayManager.Instance.PlayerTeamColor : GameplayManager.Instance.AITeamColor);
 			this.transform.GetChild(0).GetChild(0).gameObject.SetActive(false);
 
 			GameplayManager.Instance.ReceiveTileSelection(this);
 
 			localButton.interactable = false;
+		}
+
+		public void PlaceTile() {
+			this.transform.GetChild(0).gameObject.SetActive(true);
 		}
 
 		public void ResetTile() {

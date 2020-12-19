@@ -14,12 +14,12 @@ Basic Requirements:
 
 //● Checkers cannot be placed in columns that are full.
 
-● Option to reset the game.
+//● Option to reset the game.
 
 Extra Credit
 
-● Add some basic animations.
+//● Add some basic animations.
 
-● Detect when a game is won.
+//● Detect when a game is won.
 
 ● Build a simple algorithm that makes optimal decisions to win and employs some strategy.
