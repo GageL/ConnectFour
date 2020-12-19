@@ -2,3 +2,4 @@ Things to add/amend:
 
 1) Make AI tile placement "know" when its a no win placement to keep stacking any direction in general (trivial) (est ~1hr)
 2) Add AI diagonal stacking tile placement logic instead of just vertical, horizontal and random decision (trivial) (est ~1hr)
+3) Need to add logic for AI to block player
