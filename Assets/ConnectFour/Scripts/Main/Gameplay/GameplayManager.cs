@@ -15,19 +15,19 @@ namespace C4 {
 
 		#region Static Variables
 		public delegate void OnGameStart();
-		public event OnGameStart ON_GAME_START;
+		public static event OnGameStart ON_GAME_START;
 
 		public delegate void OnTileSelect();
-		public event OnTileSelect ON_TILE_SELECT;
+		public static event OnTileSelect ON_TILE_SELECT;
 
 		public delegate void OnTilePlaced();
-		public event OnTilePlaced ON_TILE_PLACED;
+		public static event OnTilePlaced ON_TILE_PLACED;
 
 		public delegate void OnEndTurn();
-		public event OnEndTurn ON_END_TURN;
+		public static event OnEndTurn ON_END_TURN;
 
 		public delegate void OnGameEnd();
-		public event OnGameEnd ON_GAME_END;
+		public static event OnGameEnd ON_GAME_END;
 		#endregion
 
 		#region Public Variables

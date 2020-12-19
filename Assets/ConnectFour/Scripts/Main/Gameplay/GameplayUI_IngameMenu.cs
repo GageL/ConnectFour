@@ -49,8 +49,8 @@ namespace C4 {
 			pauseRestartButton.onClick.AddListener(() => PauseRestartButtonClick());
 			pauseMenuQuitButton.onClick.AddListener(() => PauseMenuQuitButtonClick());
 
-			GameplayManager.Instance.ON_GAME_START += OnGameStart;
-			GameplayManager.Instance.ON_GAME_END += OnGameEnd;
+			GameplayManager.ON_GAME_START += OnGameStart;
+			GameplayManager.ON_GAME_END += OnGameEnd;
 		}
 
 		private void OnDisable() {
@@ -58,6 +58,9 @@ namespace C4 {
 			pauseMenuResumeButton.onClick.RemoveListener(() => PauseMenuResumeButtonClick());
 			pauseRestartButton.onClick.RemoveListener(() => PauseRestartButtonClick());
 			pauseMenuQuitButton.onClick.RemoveListener(() => PauseMenuQuitButtonClick());
+
+			GameplayManager.ON_GAME_START -= OnGameStart;
+			GameplayManager.ON_GAME_END -= OnGameEnd;
 		}
 
 		private void Update() {

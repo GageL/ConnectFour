@@ -40,17 +40,17 @@ namespace C4 {
 		}
 
 		private void OnEnable() {
-			GameplayManager.Instance.ON_GAME_START += OnGameStart;
-			GameplayManager.Instance.ON_TILE_SELECT += OnTileSelect;
-			GameplayManager.Instance.ON_TILE_PLACED += OnTilePlaced;
-			GameplayManager.Instance.ON_GAME_END += OnGameEnd;
+			GameplayManager.ON_GAME_START += OnGameStart;
+			GameplayManager.ON_TILE_SELECT += OnTileSelect;
+			GameplayManager.ON_TILE_PLACED += OnTilePlaced;
+			GameplayManager.ON_GAME_END += OnGameEnd;
 		}
 
 		private void OnDisable() {
-			GameplayManager.Instance.ON_GAME_START -= OnGameStart;
-			GameplayManager.Instance.ON_TILE_SELECT -= OnTileSelect;
-			GameplayManager.Instance.ON_TILE_PLACED -= OnTilePlaced;
-			GameplayManager.Instance.ON_GAME_END -= OnGameEnd;
+			GameplayManager.ON_GAME_START -= OnGameStart;
+			GameplayManager.ON_TILE_SELECT -= OnTileSelect;
+			GameplayManager.ON_TILE_PLACED -= OnTilePlaced;
+			GameplayManager.ON_GAME_END -= OnGameEnd;
 		}
 		#endregion
 
